@@ -1,104 +1,78 @@
-//prev and next buttons will append to the dom on doc ready
-$(document).ready(function () {
-    $('#container').append('<button class="prev">Previous</button>' + '<button class="next">Next</button>');
-    $('.next').on('click', moveNext);
-    $('.next').on('click', moveCircleNext);
-    $('.prev').on('click', moveBack);
-    $('.prev').on('click', moveCircleBack);
+//created an empty array to hold the information from the JSON thing;
+var omicron = [];
+//created a variable to be used as a marker for the current person/index we're looking at;
+var currentOmicron = 0;
 
+$(document).ready(function(){
+//run my load function, which gets the data from the JSON thing and also runs two other functions;
+  load();
+
+//set the listeners for my buttons;
+  $('.next').on('click', nextOmicron);
+  $('.prev').on('click', prevOmicron);
+
+  function load(){
     $.ajax({
-        type: 'GET',
-        url: '/data',
-        //for loop will run through the data and append a div to the dom; i added a unique identifer to possibily take on the pro level, but got stuck on adding functionality to my buttons;
-        success: function(data) {
-            for (var i = 0; i < data.omicron.length; i++) {
-                $('#information').append('<div class="person" id="primer' + i + '"></div>');
-                var $el = $('#information').children().last();
-                $el.append('<h2 class="name">' + data.omicron[i].name + '</h2>');
-                $el.append('<p class="github">GitHub Link: http://www.github.com/' + data.omicron[i].git_username + '</p>');
-                $el.append('<p class="shoutout">Shoutout: ' + data.omicron[i].shoutout + '</p>');
-                $('#circles').append('<div class="boxes" id="box' + i +'"></div>');
-                var $bx = $('#circles').children().last();
-                $bx.append('<p></p');
-            }
-
-            //the info is initially hidden so that the buttons can cycle through
-            $('#information').children().hide();
-            $('#information div:first').show();
-            $('#circles').children().hide();
-            $('#circles div:first').show();
-        }
+      type: "GET",
+      url: "/data",
+      success: function(data){
+        omicron = data.omicron;
+        console.log(omicron);
+//call two functions that will run along with the load function
+        addOmicron();
+        createCircles();
+      }
     });
-//created a click counter to follow the div position of the circles;
-    // var clickCount = 0;
-    //
-    // function clickCounterAdd(){
-    //   if(clickCount < 17){
-    //     clickCount ++;
-    //   }else if(clickCount = 17){
-    //     clickCount = 1;
-    //   }
-    //   console.log(clickCount);
-    // }
-    //
-    // function clickCounterSub(){
-    //   if(clickCount > 0){
-    //     clickCount --;
-    //   }else if(clickCount = -1){
-    //     clickCount = 17;
-    //   }
-    //   console.log(clickCount);
-    // }
-    // addbuttons();
-    //I'm not sure this is the best code.. I can't get the last move next to move directly to the first div.
-    function moveNext() {
-        if ($('#information div:visible').next().length !== 0) {
-            $('#information div:visible').next().show().prev().hide();
-            // current();
-        } else {
-            $('#information div:visible').hide();
-            $('#information div:first').show();
-        }
+  }
+//define function that will display the text in the defined areas
+  function addOmicron(){
+//set omi variable to point at the array; i can pull from the array because the function is being called in the .ajax area; set github var for input - i couldnt figure out how to get the link to work with attr();
+    var omi = omicron[currentOmicron];
+    var github = "http://github.com/" + omi.git_username;
+    $('#name').text(omi.name);
+    $('#git').text(github);
+    $('#shoutout').text(omi.shoutout);
+  }
+//create the circles at the bottom using a for loop; append each circle with p tags..might not be the best? kept as p so I could style;
+//used data function to assign an index number to each circle so that I can compare later;
+    function createCircles(){
+      for (var i = 0; i < omicron.length; i++) {
+        $('#circles').append('<p>' + i + '</p>');
+        $('#circles').children().last().data("index", i);
+      }
+//call update circles to update based on the start - 0 index (tyler)
+      updateCircles();
     }
-
-    function moveBack() {
-        if ($('#information div:visible').prev().length !== 0) {
-            $('#information div:visible').prev().show().next().hide();
-            // current();
-        } else {
-            $('#information div:visible').hide();
-            $('#information div:last').show();
+//update circles will update the class of the circle based on who is being click on; will compare the currentOmi with the index number;
+    function updateCircles() {
+      $('#circles').children().each(function(i, item) {
+        if($(this).data("index") == currentOmicron){
+          $(this).addClass('active');
+        }else{
+          $(this).removeClass('active');
         }
+      })
     }
-    // tried to replicate the same stuff as the display for prime info;
-    function moveCircleNext() {
-        if ($('#circles div:visible').next().length !== 0) {
-            $('#circles div:visible').next().show();
-            // current();
-        } else {
-            $('#circles div:visible').hide();
-            $('#circles div:first').show();
-        }
+//button function: will increment based on clicks, but if it goes over 16, it will reset; will also run the addOmi to replace the next info and update circles to make the current one red;
+  function nextOmicron(){
+    currentOmicron++;
+    if(currentOmicron >= omicron.length){
+      currentOmicron = 0;
     }
+    console.log(currentOmicron);
+    addOmicron();
+    updateCircles();
+  }
 
-    function moveCircleBack() {
-        if ($('#circles div:visible').prev().length !== 0) {
-            $('#circles div:visible').prev().show().next().hide();
-            // current();
-        } else {
-            $('#circles div:visible').hide();
-            $('#circles div:last').show();
-        }
+  function prevOmicron(){
+    currentOmicron--;
+    if(currentOmicron < 0){
+      currentOmicron = omicron.length - 1;
     }
-
-//created a current function that will toggle the class of the .box div concatenated with the current click count;
-    // function current() {
-    //   $('#box' + clickCount).toggleClass('currentBox');
-    //   $('#box' + (clickCount -1)).toggleClass('currentBox');
-    // }
-
-//I still need to add a toggleClass function and connect it to my button clicks in order for the circles to change colors upon click;
-
+    console.log(currentOmicron);
+    addOmicron();
+    updateCircles();
+  }
 
 
 });

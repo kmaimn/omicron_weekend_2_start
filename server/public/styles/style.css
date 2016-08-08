@@ -10,59 +10,32 @@ h1{
   font-family: monospace;
   text-align: center;
 }
-.person{
-  padding-left: 10px;
-  text-align: center;
-}
 
 #information{
   border: 5px solid black;
-  height: 150px;
+  height: 120px;
   padding-bottom: 10px;
   margin-bottom: 15px;
-}
-
-.prev, .next{
-  margin: 0 10px 0 10px;
-  border-radius: 100%;
-  height: 110px;
-  width: 110px;
-  border: 2px solid black;
-  background-color: red;
-  font-family: monospace;;
-  font-size: 20px;
-}
-#container{
   text-align: center;
 }
 
-.next{
-  background-color: green;
-  float: right;
-}
-
-.prev {
-  float: left;
-}
-.boxes{
+p {
   border: 1px solid black;
-  background-color: lightblue;
   height: 50px;
   width: 50px;
   border-radius: 100%;
   display: inline-block;
-  margin: 2px;
-  margin-top: 30px;
-
+  margin: 5px;
+  text-align: center;
 }
 
-.currentBox{
+.active{
   border: 1px solid black;
-  background-color: navy;
   height: 50px;
   width: 50px;
   border-radius: 100%;
-  display: inline;
-  margin: 2px;
-  margin-top: 30px;
+  display: inline-block;
+  margin: 5px;
+  text-align: center;
+  background-color: red;
 }
